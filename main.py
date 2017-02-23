@@ -1,4 +1,5 @@
 import sys
+from collections import defaultdict
 
 class Endpoint(object):
     def __init__(self):
@@ -21,6 +22,7 @@ class Video(object):
 def main():
     endpoints = []
     videos = []
+    cache_to_endpoint_map = defaultdict(set)
 
     with open(sys.argv[1]) as f:
         lines = f.readlines()
@@ -29,7 +31,7 @@ def main():
             videos.append(Video(video_size))
 
         current_line = 2
-        for i in range(endpoints_count):
+        for endpoint_id in range(endpoints_count):
             line = map(int, lines[current_line].split())
             e = Endpoint()
             e.data_latency = line[0]
@@ -37,6 +39,7 @@ def main():
             current_line += 1
             for j in range(caches_count):
                 cache_id, latency = map(int, lines[current_line].split())
+                cache_to_endpoint_map[cache_id].add(endpoint_id)
                 e.cache_latency[cache_id] = latency
                 current_line += 1
             endpoints.append(e)
